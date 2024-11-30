@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Virtual-Pet-Game",
-    "slug": "Virtual-Pet-Game",
+    "slug": "virtual-pet-game",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dhysdrn.virtualpetgame"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dhysdrn.virtualpetgame"
     },
     "web": {
       "bundler": "metro",
@@ -27,10 +29,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b72beb5c-f82d-415e-9c49-474f4b26c527"
+      }
+    },
+    "owner": "dhysdrn"
   }
 }
