@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { LinearGradient } from 'expo-linear-gradient';  // Correct import
+import { LinearGradient } from 'expo-linear-gradient';  
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Groq from "groq-sdk";
 
 // Initialize Groq client (replace process.env.GROQ_API_KEY with your actual API key)
@@ -13,26 +14,40 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false); // For voice recording control
 
   // Function to fetch chat completion from Groq API
-  const fetchChatCompletion = async () => {
-    setLoading(true);
+  const fetchChatCompletion = async (action: string) => {
+    setLoading(true); // Show a spinner or loading text
     try {
       const chatCompletion = await groq.chat.completions.create({
         messages: [
           {
+            role: "system",
+            content: "You are Kiko, a playful pet responding dynamically. Be cute, caring, and informative.",
+          },
+          {
             role: "user",
-            content: input || "Explain the importance of fast language models", // Default prompt if no input
+            content: input || `The user chose to ${action}. How does Kiko react?`,
           },
         ],
         model: "llama3-8b-8192",
       });
-      setResponse(chatCompletion.choices[0]?.message?.content || "No response received");
+  
+      setResponse(chatCompletion.choices[0]?.message?.content || "No response from Kiko");
     } catch (error) {
-      setResponse("Error fetching data: " + error);
+      setResponse("Error fetching Kiko's response: " + error);
     } finally {
       setLoading(false);
     }
   };
-
+  const handleSend = () => {
+    // Call fetchChatCompletion with 'send' action
+    fetchChatCompletion('send');
+    
+    // Clear the input box
+    setInput("");
+    
+    // Dismiss the keyboard
+    // Keyboard.dismiss();
+  };
   return (
     <LinearGradient
       colors={["#250152", "#000"]} // Gradient colors
@@ -46,13 +61,14 @@ export default function App() {
           style={styles.petImage}
         />
         <Text style={styles.petName}>Your Virtual Pet</Text>
+        <View style={styles.chatBox}>
+        {loading && <Text style={{ textAlign: 'center', color: 'gray' }}>Kiko is thinking...</Text>}
+          // chat response
+        <Text style={styles.chatText}>{response || "Chat messages appear here..."}</Text>
+        </View>
       </View>
 
       <View style={styles.bottomHalf}>
-        <View style={styles.chatBox}>
-          <Text style={styles.chatText}>{response || "Chat messages appear here..."}</Text>
-        </View>
-
         <View style={styles.controls}>
           {/* Start/Stop voice recognition */}
           <TouchableOpacity
@@ -71,9 +87,39 @@ export default function App() {
           />
 
           {/* Button to trigger API call */}
-          <TouchableOpacity onPress={fetchChatCompletion} style={styles.sendButton}>
+          <TouchableOpacity
+            onPress={handleSend} // Call handleSend to send message and clear input
+            style={styles.sendButton}
+          >
             <Text style={styles.buttonText}>Send</Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.menuButton} onPress={() => fetchChatCompletion('feed')}>
+            <Ionicons name="fast-food-outline" size={30} color="#ff6f61" />
+            <Text style={styles.buttonLabel}>Feed</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuButton} onPress={() => fetchChatCompletion('play')}>
+            <Ionicons name="game-controller-outline" size={30} color="#ffcc00" />
+            <Text style={styles.buttonLabel}>Play</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuButton} onPress={() => fetchChatCompletion('sleep')}>
+            <Ionicons name="bed-outline" size={30} color="#6b9fff" />
+            <Text style={styles.buttonLabel}>Sleep</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuButton} onPress={() => fetchChatCompletion('clean')}>
+            <Ionicons name="water" size={30} color="#a4df6c" />
+            <Text style={styles.buttonLabel}>Clean</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuButton} onPress={() => fetchChatCompletion('love')}>
+            <Ionicons name="heart" size={30} color="#ff69b4" />
+            <Text style={styles.buttonLabel}>Love</Text>
+          </TouchableOpacity>
+
         </View>
       </View>
     </LinearGradient>
@@ -89,7 +135,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#e6f7ff",
     padding: 20,
   },
   petImage: {
@@ -101,10 +146,10 @@ const styles = StyleSheet.create({
   petName: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
+    color: "#fff",
   },
   bottomHalf: {
-    flex: 1,
+    flex: 1.1,
     backgroundColor: "#fff",
     padding: 15,
     borderTopLeftRadius: 20,
@@ -134,7 +179,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 15,
     backgroundColor: "#fff",
-    marginRight: 10,
+    marginRight: 5,
+    marginLeft:5,
   },
   sendButton: {
     backgroundColor: "#28a745",
@@ -153,4 +199,38 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  menu: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginTop: 50,
+  },
+  menuButton: {
+    backgroundColor: "#fbe7f4",
+    width: 80,
+    height: 80,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 40,
+    margin: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  buttonLabel: {
+    marginTop: 5,
+    color: "#444",
+    fontSize: 12,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  loadingText: {
+    color: "#aaa",
+    fontStyle: "italic",
+    textAlign: "center",
+  },  
 });
+// 
